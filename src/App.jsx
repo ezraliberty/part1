@@ -1,59 +1,72 @@
-const Header = (props) => {
-  return <h1>{props.course}</h1>;
-};
+import { useState } from "react";
 
-const Part = (props) => {
+const Button = ({ handleClicks, text }) => (
+  <button onClick={handleClicks}>{text}</button>
+);
+
+const StatisticLine = ({text, value}) => {
   return (
-    <p>
-      {props.title} {props.exercises}
-    </p>
+    <table>
+      <tbody>
+        <tr>
+          <td>{text}</td>
+          <td>{value}{text === "Positive" && "%"}</td>
+        </tr>
+      </tbody>
+    </table>
   );
 };
 
-const Content = (props) => {
+const Statistics = ({good, neutral, bad, total}) => {
+  if (total === 0) {
+    return <p>No feedback given</p>;
+  }
+
   return (
     <div>
-      <Part title={props.part1} exercises={props.exercises1} />
-      <Part title={props.part2} exercises={props.exercises2} />
-      <Part title={props.part3} exercises={props.exercises3} />
+      <h1>statistics</h1>
+        <StatisticLine text="good" value={good} />
+        <StatisticLine text="neutral" value={neutral} />
+        <StatisticLine text="bad" value={bad} />
+        <StatisticLine text="total" value={total} />
+        <StatisticLine text="Average" value={total / 3} />
+        <StatisticLine text="Positive" value={(good / total) * 100} />
     </div>
   );
 };
 
-const Total = (props) => {
-  return (
-    <p>
-      Number of exercises{" "}
-      {props.exercises1 + props.exercises2 + props.exercises3}
-    </p>
-  );
-};
-
 const App = () => {
-  const course = "Half Stack application development";
-  const part1 = "Fundamentals of React";
-  const exercises1 = 10;
-  const part2 = "Using props to pass data";
-  const exercises2 = 7;
-  const part3 = "State of a component";
-  const exercises3 = 14;
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const handleGood = () => {
+    const allGood = good + 1;
+    setGood(allGood);
+    setTotal(allGood + neutral + bad);
+  };
+
+  const handleNeutral = () => {
+    const allNeutral = neutral + 1;
+    setNeutral(allNeutral);
+    setTotal(allNeutral + good + bad);
+  };
+
+  const handleBad = () => {
+    const allBad = bad + 1;
+    setBad(allBad);
+    setTotal(allBad + good + neutral);
+  };
 
   return (
     <div>
-      <Header course={course} />
-      <Content
-        part1={part1}
-        exercises1={exercises1}
-        part2={part2}
-        exercises2={exercises2}
-        part3={part3}
-        exercises3={exercises3}
-      />
-      <Total
-        exercises1={exercises1}
-        exercises2={exercises2}
-        exercises3={exercises3}
-      />
+      <h1>give feedback</h1>
+      <Button handleClicks={handleGood} text="Good" />
+      <Button handleClicks={handleNeutral} text="Neutral" />
+      <Button handleClicks={handleBad} text="Bad" />
+      <Statistics good={good} neutral={neutral} bad={bad} total={total} />
     </div>
   );
 };
